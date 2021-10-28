@@ -1,0 +1,41 @@
+// Versus replay (for network fight) filename definition
+// ** Please do not change unless absolutely necessary **
+
+[Header]
+
+// An error will occur if more than 256 characters.
+Name = NetVS_<NDUNAME>-<1PNAME>x<2PNAME>_<Y><M><D><H><m><S>
+
+// Filename extension
+Ext = .rep
+
+// String definitions
+// 
+// Names
+// <PCNAME> --> Player side（Player when game starts）
+// <CPUNAME> --> Computer side（Opposing player when game starts）
+// <1PNAME> --> Player 1 side
+// <2PNAME> --> Player 2 side
+// <NSUNAME> --> Player 1 side (Your own user name during a network fight) *Ignored except during a network fight.
+// <NDUNAME> --> Player 2 side (Opponent user name during a network fight) *Ignored except during a network fight.
+//
+// Styles
+// <PCSTYLE> --> Player side（Player when game starts）
+// <CPUSTYLE> --> Computer side (Opposing player when game starts)
+// <1PSTYLE> --> Player 1 side
+// <2PSTYLE> --> Player 2 side
+//
+// Date
+//
+// <Y> --> Year (2 digits each)
+// <M> --> Month
+// <D> --> Day
+// <H> --> Hours
+// <m> --> Minutes
+// <S> --> Seconds
+//
+// *Spaces cannot be used in filenames.
+// *"<" and ">" cannot be used in filenames.
+// *The same filenames are always overwritten.
+// *Please do not change the file extension. (It will not be displayed in the file list)
+

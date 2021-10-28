@@ -1,0 +1,85 @@
+[ OS ]
+Windows 10 Pro 64-bit (6.2, Build 9200) (19041.vb_release.191206-1406)
+[ CPU ]
+Intel(R) Core(TM) i5-8600K CPU @ 3.60GHz (6 CPUs), ~3.6GHz
+[ MEMORY ]
+16384MB RAM
+[ DISPLAY ]
+1920 x 1080 (32 bit) (60Hz)
+
+[ Display Adapter ]
+NVIDIA GeForce GTX 1060 6GB
+4095 MB RAM
+Driver Version: 30.00.0014.7196
+
+[ DirectX ]
+DirectX 12
+[ System Manufacturer ]
+To Be Filled By O.E.M.
+To Be Filled By O.E.M.
+
+[ DirectX Information ]
+Vertex Shader 3.0
+Pixel Shader 3.0
+Maximum Texture Size: 16384x16384
+Maximum Texture Blend Stages: 8
+Maximum Point Size: 0
+Maximum Primitive Count: 16777215
+
+[ TextureFormat  (F)ull,(T)exture,(D)epth,(R)ender ]
+D3DFMT_R8G8B8 (----)
+D3DFMT_A8R8G8B8 (-T-R)
+D3DFMT_X8R8G8B8 (FT-R)
+D3DFMT_R5G6B5 (FT-R)
+D3DFMT_X1R5G5B5 (-T-R)
+D3DFMT_A1R5G5B5 (-T--)
+D3DFMT_A4R4G4B4 (-T--)
+D3DFMT_R3G3B2 (----)
+D3DFMT_A8 (-T-R)
+D3DFMT_A8R3G3B2 (----)
+D3DFMT_X4R4G4B4 (----)
+D3DFMT_A2B10G10R10 (-T-R)
+D3DFMT_G16R16 (-T-R)
+D3DFMT_A8P8 (----)
+D3DFMT_P8 (----)
+D3DFMT_L8 (-T-R)
+D3DFMT_L16 (-T-R)
+D3DFMT_A8L8 (-T--)
+D3DFMT_A4L4 (----)
+D3DFMT_V8U8 (-T--)
+D3DFMT_Q8W8V8U8 (-T--)
+D3DFMT_V16U16 (-T--)
+D3DFMT_Q16W16V16U16 (----)
+D3DFMT_CxV8U8 (----)
+D3DFMT_L6V5U5 (----)
+D3DFMT_X8L8V8U8 (-T--)
+D3DFMT_A2W10V10U10 (----)
+D3DFMT_MULTI2_ARGB8 (----)
+D3DFMT_G8R8_G8B8 (----)
+D3DFMT_R8G8_B8G8 (----)
+D3DFMT_DXT1 (-T--)
+D3DFMT_DXT2 (-T--)
+D3DFMT_DXT3 (-T--)
+D3DFMT_DXT4 (-T--)
+D3DFMT_DXT5 (-T--)
+D3DFMT_UYVY (----)
+D3DFMT_YUY2 (----)
+D3DFMT_D16_LOCKABLE (----)
+D3DFMT_D32 (----)
+D3DFMT_D15S1 (----)
+D3DFMT_D24S8 (-TD-)
+D3DFMT_D24X8 (-TD-)
+D3DFMT_D24X4S4 (----)
+D3DFMT_D32F_LOCKABLE (-TD-)
+D3DFMT_D24FS8 (----)
+D3DFMT_D16 (-TD-)
+D3DFMT_VERTEXDATA (----)
+D3DFMT_INDEX16 (----)
+D3DFMT_INDEX32 (----)
+D3DFMT_R16F (-T-R)
+D3DFMT_G16R16F (-T-R)
+D3DFMT_A16B16G16R16F (-T-R)
+D3DFMT_R32F (-T-R)
+D3DFMT_G32R32F (-T-R)
+D3DFMT_A32B32G32R32F (-T-R)
+
