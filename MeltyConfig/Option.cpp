@@ -35,7 +35,7 @@ void Option::getInput()
 		throw Invalid{ "Get Value: Invalid Input" };
 
 	if (!(validateInput(input))) {
-		throw Invalid{ "Get Value: Invalid Input, input out of range." };
+		throw Invalid{ "Get Value: Invalid Input, input out of range. Please insert valid input." };
 	}
 	else
 		pUserInput = input;

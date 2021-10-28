@@ -5,11 +5,22 @@
 #include "Option.h"
 #include "Program.h"
 
+///////////////////////////////////
+// 
+// Melty Config v0.2
+// Created by dor3k
+// https://github.com/dor3k/MeltyConfig
+// 
+// - Implemented error handling
+// - Code cleanup
+// 
+///////////////////////////////////
+
 //TODO: Main program loop
 //TODO: Builders
-//TODO: Clean up the mess
 //TODO: Better user interface
-//TODO: Error handling
+//TODO: Better program structure, move option methods to different classes
+//TODO: Byte container struct
 
 bool checkHeaderFile(std::basic_fstream<unsigned char>& fs) {
 	unsigned char file[0x17B];
@@ -75,8 +86,6 @@ void populateByteContainers(std::basic_fstream<unsigned char>& fs) {
 
 int main()
 try {
-	int input{ -1 };
-
 	std::basic_fstream<unsigned char> fs("System/_AAGameData.dat", std::ios::in | std::ios::out | std::ios::binary);
 	if (!fs) 
 		throw Program::Invalid{ "Cannot open ./System/_AAGameData.dat. \nMake sure the program is in the same directory as MBAA.exe \nAND that the System directory is NOT set to read only" };
@@ -93,7 +102,7 @@ try {
 	Option optionTimerSpeed{ "Speed of the round timer, 0 disables time outs. Defaults to 2 (normal)\n0 (infinity) to 4 (fastest)\n", std::vector<unsigned int>{0, 1, 2, 3, 4}, 0x10, fs, 2 };
 	Option optionWinCountVersus{ "Wins required per game in versus mode. Defaults to 2 \n1 to 3\n", std::vector<unsigned int>{1, 2, 3}, 0x1C, fs, 2 };
 	Option optionSaveReplay{ "Toggle for automatically saving replays after each game. Defaults to 0 (off)  \n0 (off) or 1 (on)\n", std::vector<unsigned int>{0, 1}, 0x28, fs, 0 };
-	Option optionBgmVolume{ "Music volume. The in-game value is 20 minus this, with the exception of off which is 21. 20 might not be valid. Defaults to 10\n0 (loudest) to 21 (off)\n", std::vector<unsigned int>{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21}, 0x144, fs, 10 };
+	Option optionBgmVolume{ "Music volume. The in-game value is 20 minus this, with the exception of off which is 21. Defaults to 10\n0 (loudest) to 21 (off)\n", std::vector<unsigned int>{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21}, 0x144, fs, 10 };
 	Option optionSfxVolume{ "Sound Effect and Voice volume. The in-game value is 20 minus this, with the exception of off which is 21. 20 might not be valid. Defaults to 10\n0 (loudest) to 21 (off)\n", std::vector<unsigned int>{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21}, 0x148, fs, 10 };
 	Option optionCharacterFilter{ "The character filter mode. Defaults to 2 (full) \n0 (off) 1 (edge) 2 (full) 3 (linear)\n", std::vector<unsigned int>{0, 1, 2, 3}, 0x160, fs, 2 };
 	Option optionStageAnimations{ "Whether stage animations are present. Defaults to 1 (on) \n0 (off) or 1 (on)\n", std::vector<unsigned int>{0, 1}, 0x164, fs, 1 };
@@ -104,124 +113,145 @@ try {
 	
 	//TODO: Shitty main loop
 	bool exit{ 0 };
-	int option{ 0 };
+	int input{ -1 };
 	while (!exit) {
-		populateByteContainers(fs);
+		try {
+			populateByteContainers(fs);
 
-		switch (input) {
-		default:
-			std::cin.clear();
-			std::cout << "Melty Config v 0.1\n";
-			std::cout <<
-				"[1]  Difficulty\t\t : " << int(cpuDifficulty[0]) << "\n" <<
-				"[2]  Win Count (Arcade)\t : " << int(winCountArcade[0]) << "\n" <<
-				"[3]  Damage Level\t : " << int(damageLevel[0]) << "\n" <<
-				"[4]  Timer Speed\t : " << int(timerSpeed[0]) << "\n" <<
-				"[5]  Win Count (VS)\t : " << int(winCountVersus[0]) << "\n" <<
-				"[6]  Replay Save\t : " << int(saveReplay[0]) << "\n" <<
-				"[7]  BGM Volume\t\t : " << int(bgmVolume[0]) << "\n" <<
-				"[8]  SFX Volume\t\t : " << int(sfxVolume[0]) << "\n" <<
-				"[9]  Character Filter\t : " << int(characterFilter[0]) << "\n" <<
-				"[10] Stage Animations\t : " << int(stageAnimations[0]) << "\n" <<
-				"[11] View FPS\t\t : " << int(viewFps[0]) << "\n" <<
-				"[12] Framerate\t\t : " << int(frameRate[0]) << "\n" <<
-				"[13] Screen Filter\t : " << int(screenFilter[0]) << "\n" <<
-				"[14] Aspect Ratio\t : " << int(aspectRatio[0]) << "\n"
-				"[15] Default All\t " << "\n"
-				"[0]  Exit\t\t  " << "\n>";
-			std::cin >> input;
+			switch (input) {
+			default:
+				std::cin.clear();
+				std::cout << "Melty Config v 0.2\n";
+				std::cout <<
+					"[1]  Difficulty\t\t : " << int(cpuDifficulty[0]) << "\n" <<
+					"[2]  Win Count (Arcade)\t : " << int(winCountArcade[0]) << "\n" <<
+					"[3]  Damage Level\t : " << int(damageLevel[0]) << "\n" <<
+					"[4]  Timer Speed\t : " << int(timerSpeed[0]) << "\n" <<
+					"[5]  Win Count (VS)\t : " << int(winCountVersus[0]) << "\n" <<
+					"[6]  Replay Save\t : " << int(saveReplay[0]) << "\n" <<
+					"[7]  BGM Volume\t\t : " << int(bgmVolume[0]) << "\n" <<
+					"[8]  SFX Volume\t\t : " << int(sfxVolume[0]) << "\n" <<
+					"[9]  Character Filter\t : " << int(characterFilter[0]) << "\n" <<
+					"[10] Stage Animations\t : " << int(stageAnimations[0]) << "\n" <<
+					"[11] View FPS\t\t : " << int(viewFps[0]) << "\n" <<
+					"[12] Framerate\t\t : " << int(frameRate[0]) << "\n" <<
+					"[13] Screen Filter\t : " << int(screenFilter[0]) << "\n" <<
+					"[14] Aspect Ratio\t : " << int(aspectRatio[0]) << "\n"
+					"[15] Default All\t " << "\n"
+					"[0]  Exit\t\t  " << "\n>";
+				std::cin >> input;
 
-			//When in doubt, flush the buffer
-			while (!std::cin) {
-				throw Program::Invalid{ "Invalid input" };
+				//Catch std::cin failing and reset its state
+				while (!std::cin) {
+					std::cin.clear();
+					std::cin.ignore(100, '\n');
+					input = 999;
+
+					std::cerr << "\nstd::cin failed. Please insert valid input\n";
+				}
+				break;
+			case 0:
+				exit = 1;
+				break;
+			case 1:
+				optionCpuDifficulty.initialize();
+				input = 999;
+				break;
+			case 2:
+				optionWinCountArcade.initialize();
+
+				input = 999;
+				break;
+			case 3:
+				optionDamageLevel.initialize();
+				input = 999;
+				break;
+			case 4:
+				optionTimerSpeed.initialize();
+				input = 999;
+				break;
+			case 5:
+				optionWinCountVersus.initialize();
+				input = 999;
+				break;
+			case 6:
+				optionSaveReplay.initialize();
+				input = 999;
+				break;
+			case 7:
+				optionBgmVolume.initialize();
+				input = 999;
+				break;
+			case 8:
+				optionSfxVolume.initialize();
+				input = 999;
+				break;
+			case 9:
+				optionCharacterFilter.initialize();
+				input = 999;
+				break;
+			case 10:
+				optionStageAnimations.initialize();
+				input = 999;
+				break;
+			case 11:
+				optionViewFps.initialize();
+				input = 999;
+				break;
+			case 12:
+				optionFrameRate.initialize();
+				input = 999;
+				break;
+			case 13:
+				optionScreenFilter.initialize();
+				input = 999;
+				break;
+			case 14:
+				optionAspectRatio.initialize();
+				input = 999;
+				break;
+			case 15:
+				std::string defaultOptionInput{ "" };
+				std::cout << "\nAre you sure you want to set all settings to their default values?\n0 (no) or 1 (yes)\n>";
+				std::cin >> defaultOptionInput;
+				if (defaultOptionInput == "1") {
+					optionAspectRatio.setToDefault();
+					optionBgmVolume.setToDefault();
+					optionCharacterFilter.setToDefault();
+					optionCpuDifficulty.setToDefault();
+					optionDamageLevel.setToDefault();
+					optionFrameRate.setToDefault();
+					optionSaveReplay.setToDefault();
+					optionScreenFilter.setToDefault();
+					optionSfxVolume.setToDefault();
+					optionStageAnimations.setToDefault();
+					optionTimerSpeed.setToDefault();
+					optionViewFps.setToDefault();
+					optionWinCountArcade.setToDefault();
+					optionWinCountVersus.setToDefault();
+
+					std::cout << "\nAll options were set to their default values\n";
+				}
+				input = 999;
+				break;
+			}
+		}
+		catch (Program::Invalid& e){
+			if (!std::cin) {
 				std::cin.clear();
 				std::cin.ignore(100, '\n');
 			}
-			break;
-		case 0:
-			exit = 1;
-			break;
-		case 1:
-			optionCpuDifficulty.initialize();
-			input = 999;
-			break;
-		case 2:
-			optionWinCountArcade.initialize();
 
-			input = 999;
-			break;
-		case 3:
-			optionDamageLevel.initialize();
-			input = 999;
-			break;
-		case 4:
-			optionTimerSpeed.initialize();
-			input = 999;
-			break;
-		case 5:
-			optionWinCountVersus.initialize();
-			input = 999;
-			break;
-		case 6:
-			optionSaveReplay.initialize();
-			input = 999;
-			break;
-		case 7:
-			optionBgmVolume.initialize();
-			input = 999;
-			break;
-		case 8:
-			optionSfxVolume.initialize();
-			input = 999;
-			break;
-		case 9:
-			optionCharacterFilter.initialize();
-			input = 999;
-			break;
-		case 10:
-			optionStageAnimations.initialize();
-			input = 999;
-			break;
-		case 11:
-			optionViewFps.initialize();
-			input = 999;
-			break;
-		case 12:
-			optionFrameRate.initialize();
-			input = 999;
-			break;
-		case 13:
-			optionScreenFilter.initialize();
-			input = 999;
-			break;
-		case 14:
-			optionAspectRatio.initialize();
-			input = 999;
-			break;
-		case 15:
-			std::string defaultOptionInput{ "" };
-			std::cout << "\nAre you sure you want to set all settings to their default values?\n0 (no) or 1 (yes)\n>";
-			std::cin >> defaultOptionInput;
-			if (defaultOptionInput == "1") {
-				optionAspectRatio.setToDefault();
-				optionBgmVolume.setToDefault();
-				optionCharacterFilter.setToDefault();
-				optionCpuDifficulty.setToDefault();
-				optionDamageLevel.setToDefault();
-				optionFrameRate.setToDefault();
-				optionSaveReplay.setToDefault();
-				optionScreenFilter.setToDefault();
-				optionSfxVolume.setToDefault();
-				optionStageAnimations.setToDefault();
-				optionTimerSpeed.setToDefault();
-				optionViewFps.setToDefault();
-				optionWinCountArcade.setToDefault();
-				optionWinCountVersus.setToDefault();
+			std::cerr << "Exception caught: Program error\n" << e.what << '\n';
+		}
 
-				std::cout << "\nAll options were set to their default values\n";
+		catch (Option::Invalid& e) {
+			if (!std::cin) {
+				std::cin.clear();
+				std::cin.ignore(100, '\n');
 			}
-			input = 999;
-			break;
+
+			std::cerr << "Exception caught: Option error\n" << e.what << '\n';
 		}
 	}
 	return 0;
@@ -232,9 +262,8 @@ catch (Option::Invalid& e) {
 			std::cin.clear();
 			std::cin.ignore(100, '\n');
 		}
-		
-
-		std::cerr << "\nUnchaught Option error.";
+	
+		std::cerr << "\nUnchaught expection: Option error.";
 		std::cerr << e.what << "\nThe program will now terminate. Press any key. ";
 		std::cin >> input;
 		return 1;
@@ -246,7 +275,7 @@ catch (Program::Invalid& e) {
 			std::cin.ignore(100, '\n');
 		}
 
-		std::cerr << "\nUnchaught Program error.";
+		std::cerr << "\nUnchaught exception: Program error.";
 		std::cerr << e.what << "\nThe program will now terminate. Press any key. ";
 		std::cin >> input;
 		return 1;
