@@ -1,19 +1,20 @@
 #pragma once
 #include <string>
-#include <vector>
 #include <iostream>
 #include <fstream>
+#include <conio.h>
+#include <sstream>
 
-class Option
+class OptionBinary
 {
 public:
-	Option(std::string description, std::vector<unsigned int> values, unsigned int offset, std::basic_fstream<unsigned char>& filestream, unsigned int defaultValue);
+	OptionBinary(std::string description, std::pair<unsigned int, unsigned int> valuesRange, unsigned int offset, std::basic_fstream<unsigned char>& filestream, unsigned int defaultValue);
 	class Invalid { public: std::string what{ "" }; };
 	void initialize();
 	void setToDefault();
 
 	std::string getDescription() const { return pDesc; }
-	std::vector<unsigned int> getValues() const { return pValues; }
+	std::pair<unsigned int, unsigned int> getValuesRange() const { return pValuesRange; }
 	unsigned int offset() const { return pOffset; }
 private:
 	void print();
@@ -22,7 +23,7 @@ private:
 	bool validateInput(int& input);
 
 	std::string pDesc;
-	std::vector<unsigned int> pValues;
+	std::pair<unsigned int, unsigned int> pValuesRange;
 	std::basic_fstream<unsigned char>& pFileStream;
 	const unsigned int pOffset{ 0x0 };
 	unsigned int pUserInput{ 0 };

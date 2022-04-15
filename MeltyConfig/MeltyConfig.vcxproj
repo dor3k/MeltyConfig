@@ -140,12 +140,15 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Option.cpp" />
+    <ClCompile Include="OptionBinary.cpp" />
+    <ClCompile Include="OptionIni.cpp" />
     <ClCompile Include="Program.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Option.h" />
+    <ClInclude Include="OptionBinary.h" />
+    <ClInclude Include="OptionIni.h" />
     <ClInclude Include="Program.h" />
+    <ClInclude Include="SimpleIni.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
