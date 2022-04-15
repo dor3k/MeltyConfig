@@ -2,7 +2,8 @@
 ###### A program which allows you to edit Melty Blood Actress Again Current Code's config data files without the need to open up MBAA.exe to do so.
 
 ## Getting Started
-1. Download the MeltyConfig.exe or compile the program yourself
+1. Download the latest MeltyConfig release from https://github.com/dor3k/MeltyConfig/releases or compile the program yourself
+- If you're unsure only download MeltyConfig.exe
 2. Place the MeltyConfig.exe into the folder containing MBAA.exe or run it wherever you want and provide appropriate paths in MeltyConfig.ini
 3. Run the program and press the appropriate button to edit whatever option you want
 4. Insert the desired value and hit enter
