@@ -112,7 +112,7 @@ std::vector<std::pair<std::string, int>> parseAppIniStream(std::fstream& fs) {
 int main()
 try {
 	//Create MeltyConfig.ini containing path to System/
-	//If not defined assumes a default path or ./System/
+	//If not defined assumes a default path of ./System/
 	CSimpleIniCaseA mainini;
 	mainini.SetUnicode();
 	SI_Error rcmainini = mainini.LoadFile("MeltyConfig.ini");
