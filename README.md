@@ -1,4 +1,4 @@
-# MeltyConfig 0.3
+# MeltyConfig 0.3.1
 ###### A program which allows you to edit Melty Blood Actress Again Current Code's config data files without the need to open up MBAA.exe to do so.
 
 ## Getting Started
@@ -10,7 +10,7 @@
 5. After you're done close the program or choose Exit in the options menu for the program to close
 
 MAKE SURE THE GAME IS NOT OPEN WHEN YOU ARE EDITING THE CONFIG FILES AS THE CHANGES MAY NOT SAVE
-## Changelog 0.3
+## Changelog 0.3.1
 - Bugfixes
 - Added the ability to edit _App.ini
 - Improved error checking
