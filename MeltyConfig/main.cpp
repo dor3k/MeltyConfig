@@ -288,7 +288,7 @@ try {
 				}
 			}
 			if (programWindow == 1) {
-				auto fs_ini{ openAppIniFileStream("System/_App.ini") };
+				auto fs_ini{ openAppIniFileStream(pv_ini_path) };
 				std::vector<std::pair<std::string, int>> vIni{ parseAppIniStream(fs_ini) };
 				std::cout << PROGRAM_TITLE;
 				std::cout <<
