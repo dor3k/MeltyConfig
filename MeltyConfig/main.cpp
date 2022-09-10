@@ -11,14 +11,14 @@
 #include "SimpleIni.h"
 
 //program title macro
-constexpr auto PROGRAM_TITLE = "Melty Config v 0.3\n";
+constexpr auto PROGRAM_TITLE = "Melty Config v 0.3.1\n";
 
 ///////////////////////////////////
 // 
-// Melty Config v0.3
+// Melty Config v0.3.1
 // Created by dor3k
 // https://github.com/dor3k/MeltyConfig
-// 
+//
 // - Bugfixes
 // - Improved error checking
 // - Improved user experience
