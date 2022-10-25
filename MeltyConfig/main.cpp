@@ -5,23 +5,25 @@
 #include <conio.h>
 #include <utility>
 #include <limits>
+#include <tchar.h>
 #include "OptionBinary.h"
 #include "OptionIni.h"
 #include "Program.h"
 #include "SimpleIni.h"
 
 //program title macro
-constexpr auto PROGRAM_TITLE = "Melty Config v 0.3.1\n";
+constexpr auto PROGRAM_TITLE = "Melty Config v0.4\n";
+
 
 ///////////////////////////////////
 // 
-// Melty Config v0.3.1
+// Melty Config v0.4
 // Created by dor3k
 // https://github.com/dor3k/MeltyConfig
 //
 // - Bugfixes
-// - Improved error checking
-// - Improved user experience
+// - Volume Options are now displayed and inputted in a logical way reflecting their in-game values instead of their internal ones
+// - Added the option to abort changing values
 // 
 ///////////////////////////////////
 
@@ -36,13 +38,13 @@ bool checkAAGameDataHeaderFile(std::basic_fstream<unsigned char>& fs) {
 	fs.seekg(0);
 	fs.read(file, 0x17B);
 
-	if (!(file[0] == 0x04 && file[1] == 0xF0 && file[2] == 0xFF && file[3] == 0xF0))
-		return false;
-	else
+	if (file[0] == 0x04 && file[1] == 0xF0 && file[2] == 0xFF && file[3] == 0xF0)
 		return true;
+	else
+		return false;
 }
 
-void populateByteContainers(std::basic_fstream<unsigned char>& fs) {
+void getReadableOptionValues(std::basic_fstream<unsigned char>& fs) {
 	fs.seekg(0x04);
 	fs.read(cpuDifficulty, 1);
 	fs.seekg(0x08);
@@ -71,6 +73,16 @@ void populateByteContainers(std::basic_fstream<unsigned char>& fs) {
 	fs.read(screenFilter, 1);
 	fs.seekg(0x178);
 	fs.read(aspectRatio, 1);
+
+	//Required conversion to display the .dat values in a human-readable manner
+	//Ingame values is equal to .dat Volume Value - 20
+	//With .dat Volume Value 21 being ingame off
+	bgmVolume[0] = 20 - bgmVolume[0];
+	if (bgmVolume[0] > 20)
+		bgmVolume[0] = 0;
+	sfxVolume[0] = 20 - sfxVolume[0];
+	if (sfxVolume[0] > 20)
+		sfxVolume[0] = 0;
 }
 
 std::fstream openAppIniFileStream(std::string location) {
@@ -111,6 +123,8 @@ std::vector<std::pair<std::string, int>> parseAppIniStream(std::fstream& fs) {
 
 int main()
 try {
+	SetConsoleTitle(_T("Melty Config 0.4"));
+
 	//Create MeltyConfig.ini containing path to System/
 	//If not defined assumes a default path of ./System/
 	CSimpleIniCaseA mainini;
@@ -134,7 +148,7 @@ try {
 	if (!validateAAGameDataFileStream(fs))
 		return 11;
 
-	//SimpleIni App ini stream
+	//SimpleIni App.ini stream
 	CSimpleIniCaseA app_ini;
 	app_ini.SetUnicode();
 	SI_Error app_ini_rc = app_ini.LoadFile(pv_ini_path);
@@ -150,14 +164,14 @@ try {
 	OptionBinary optionTimerSpeed{ "Speed of the round timer, 0 disables time outs. Defaults to 2 (normal)\n0 (infinity) to 4 (fastest)\n", std::pair<unsigned int, unsigned int>{0, 4}, 0x10, fs, 2 };
 	OptionBinary optionWinCountVersus{ "Wins required per game in versus mode. Defaults to 2 \n1 to 3\n", std::pair<unsigned int, unsigned int>{1, 3}, 0x1C, fs, 2 };
 	OptionBinary optionSaveReplay{ "Toggle for automatically saving replays after each game. Defaults to 0 (off)  \n0 (off) or 1 (on)\n", std::pair<unsigned int, unsigned int>{0, 1}, 0x28, fs, 0 };
-	OptionBinary optionBgmVolume{ "Music volume. The in-game value is 20 minus this, with the exception of off which is 21. Defaults to 10\n0 (loudest) to 21 (off)\n", std::pair<unsigned int, unsigned int>{0, 21}, 0x144, fs, 10 };
-	OptionBinary optionSfxVolume{ "Sound Effect and Voice volume. The in-game value is 20 minus this, with the exception of off which is 21. 20 might not be valid. Defaults to 10\n0 (loudest) to 21 (off)\n", std::pair<unsigned int, unsigned int>{0, 21}, 0x148, fs, 10 };
+	OptionBinary optionBgmVolume{ "Music volume. Defaults to 10\n0 (off) to 20 (loudest)\n", std::pair<unsigned int, unsigned int>{0, 20}, 0x144, fs, 10, true};
+	OptionBinary optionSfxVolume{ "Sound Effect and Voice volume. Defaults to 10\n0 (off) to 20 (loudest)\n", std::pair<unsigned int, unsigned int>{0, 20}, 0x148, fs, 10, true};
 	OptionBinary optionCharacterFilter{ "The character filter mode. Defaults to 2 (full) \n0 (off) 1 (edge) 2 (full) 3 (linear)\n", std::pair<unsigned int, unsigned int>{0, 3}, 0x160, fs, 2 };
 	OptionBinary optionStageAnimations{ "Whether stage animations are disabled or not. Defaults to 0 (no)\n0 (no) or 1 (yes)\n", std::pair<unsigned int, unsigned int>{0, 1}, 0x164, fs, 0 };
 	OptionBinary optionViewFps{ "Whether the FPS counter is shown. Defaults to 0 (off) \n0 (off) or 1 (on)\n", std::pair<unsigned int, unsigned int>{0, 1}, 0x168, fs, 0 };
 	OptionBinary optionFrameRate{ "Sets the speed of the game. Defaults to 0 (normal) \n0 (normal) or 1 (half)\n", std::pair<unsigned int, unsigned int>{0, 1}, 0x16C, fs, 0 };
 	OptionBinary optionScreenFilter{ "Toggle for the screen filter. Defaults to 0 (off) \n0 (off) or 1 (on)\n", std::pair<unsigned int, unsigned int>{0, 1}, 0x174, fs, 0 };
-	OptionBinary optionAspectRatio{ "The aspect ratio setting of the game. Overrides the value in _App.ini. Defaults to 0 (normal)\n0 (normal) 1 (auto) 2 (4:3) 3 (16:9) 4 (16:10) 5 (5:4) 6 (15:9)\n", std::pair<unsigned int, unsigned int>{0, 6}, 0x178, fs, 0 };
+	OptionBinary optionAspectRatio{ "The aspect ratio setting of the game. Overrides the value in _App.ini. Defaults to 1 (normal)\n0 (normal) 1 (auto) 2 (4:3) 3 (16:9) 4 (16:10) 5 (5:4) 6 (15:9)\n", std::pair<unsigned int, unsigned int>{0, 6}, 0x178, fs, 1 };
 	
 	OptionIni optionNoVsMovie{ "Use simple vs mode screen. Defaults to 0 (off)\n0 (off) or 1 (on)\n", std::pair<unsigned int, unsigned int>{0, 1}, "NoVsMovie", "No Versus Movie", app_ini, app_ini_rc, pv_ini_path, 0 };
 	OptionIni optionWindowed{ "Start the game in windowed mode. Defaults to 0 (fullscreen)\n0 (full screen) or 1 (windowed)\n", std::pair<unsigned int, unsigned int>{0, 1}, "Windowed", "Windowed Mode", app_ini, app_ini_rc, pv_ini_path, 0 };
@@ -180,7 +194,7 @@ try {
 				std::cin.ignore((std::numeric_limits<std::streamsize>::max)(), '\n');
 			}
 			if (programWindow == 0) {
-				populateByteContainers(fs);
+				getReadableOptionValues(fs);
 				std::cout << PROGRAM_TITLE;
 				std::cout <<
 					"[1] Difficulty\t\t\t : " << int(cpuDifficulty[0]) << "\n" <<
@@ -406,5 +420,16 @@ catch (Program::Invalid& e) {
 		return 1;
 }
 catch (std::exception& e) {
-	std::cout << e.what();
+
+	std::string input;
+	if (!std::cin) {
+		std::cin.clear();
+		std::cin.ignore((std::numeric_limits<std::streamsize>::max)(), '\n');
+	}
+
+	std::cerr << "\nUnchaught exception: std::exception";
+	std::cerr << e.what();
+	std::cerr << "\nThe program will now terminate. Press any key. ";
+	input = _getch();
+	return 1;
 }
