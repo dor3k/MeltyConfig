@@ -6,6 +6,7 @@
 #include <sstream>
 #include <limits>
 #include "SimpleIni.h"
+#include "Program.h"
 
 class OptionIni
 {

@@ -4,13 +4,12 @@
 #include <fstream>
 #include <sstream>
 #include <limits>
-#include "Program.h"
 
 class OptionBinary
 {
 public:
-	OptionBinary(std::string description, std::pair<unsigned int, unsigned int> valuesRange, unsigned int offset, std::fstream& filestream, unsigned int defaultValue);
-	OptionBinary(std::string description, std::pair<unsigned int, unsigned int> valuesRange, unsigned int offset, std::fstream& filestream, unsigned int defaultValue, bool convertMusicValues);
+	OptionBinary(std::string description, std::pair<unsigned int, unsigned int> valuesRange, unsigned int offset, std::basic_fstream<unsigned char>& filestream, unsigned int defaultValue);
+	OptionBinary(std::string description, std::pair<unsigned int, unsigned int> valuesRange, unsigned int offset, std::basic_fstream<unsigned char>& filestream, unsigned int defaultValue, bool convertMusicValues);
 	class Invalid { public: std::string what{ "" }; };
 	void initialize();
 	void setToDefault();
@@ -27,7 +26,7 @@ private:
 	
 	std::string pDesc;
 	std::pair<unsigned int, unsigned int> pValuesRange;
-	std::fstream& pFileStream;
+	std::basic_fstream<unsigned char>& pFileStream;
 	const unsigned int pOffset{ 0x0 };
 	unsigned int pUserInput{ 0 };
 	unsigned int pDefaultValue{ 0x0 };

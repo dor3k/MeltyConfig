@@ -1,10 +1,12 @@
-#include <cstddef>
 #include <fstream>
 #include <iostream>
 #include <vector>
 #include <string>
 #include <utility>
 #include <limits>
+#include <cstdint>
+//#include <conio.h>
+//#include <tchar.h>
 #include "OptionBinary.h"
 #include "OptionIni.h"
 #include "Program.h"
@@ -26,29 +28,25 @@ constexpr auto PROGRAM_TITLE = "Melty Config v0.4";
 // 
 ///////////////////////////////////
 
-//BUG: If the sound values are set to 0x14 then the function will not change it and not error out
-
 //TODO: Main program loop
 //TODO: Builders
 //TODO: Better program structure, move option methods to different classes
 //TODO: Byte container struct
-//TODO: Stuff like pv_ini_path, data for filestream and similar should be inside of a program class
-//      This class should provide this data as members.
-//      Streams also need to be properly closed and opened instead of just passing the stream as a reference.
 
-bool checkAAGameDataHeaderFile(std::fstream& fs) {
-	const size_t aaGameDataBufferLength {0x17B};
-
+bool checkAAGameDataHeaderFile(std::basic_fstream<unsigned char>& fs) {
 	if(fs.is_open()){
-	unsigned char aaGameDataBuffer[aaGameDataBufferLength];
+	unsigned char file[0x17B]{0};
 
-	fs.read((char*)(&aaGameDataBuffer[0]), aaGameDataBufferLength);
+	fs.seekg(0x0);
+	fs.read(file, sizeof file);
+	
 	//DEBUG
-	//for (int i = 0; i < 0x17B; ++i){
-	//	std::cout << std::hex << i <<": " << int(aaGameDataBuffer[i]) << std::dec << "\n";
-	//}
+	for (int i = 0; i < 0x17B; ++i){
+		std::cout << std::hex << i <<": " << int(file[i]) << std::dec << "\n";
+	}
 
-	if (aaGameDataBuffer[0] == 0x04 && aaGameDataBuffer[1] == 0xF0 && aaGameDataBuffer[2] == 0xFF && aaGameDataBuffer[3] == 0xF0)
+
+	if (file[0] == 0x04 && file[1] == 0xF0 && file[2] == 0xFF && file[3] == 0xF0)
 		return true;
 	else
 		return false;
@@ -56,7 +54,7 @@ bool checkAAGameDataHeaderFile(std::fstream& fs) {
 	else return false;
 }
 
-void getReadableOptionValues(std::fstream& fs) {
+void getReadableOptionValues(std::basic_fstream<unsigned char>& fs) {
 	fs.seekg(0x04);
 	fs.read(cpuDifficulty, 1);
 	fs.seekg(0x08);
@@ -90,21 +88,21 @@ void getReadableOptionValues(std::fstream& fs) {
 	//Ingame values is equal to .dat Volume Value - 20
 	//With .dat Volume Value 21 being ingame off
 	bgmVolume[0] = 20 - bgmVolume[0];
-	if (bgmVolume[0] > 20 || bgmVolume[0] < 0)
+	if (bgmVolume[0] > 20)
 		bgmVolume[0] = 0;
 	sfxVolume[0] = 20 - sfxVolume[0];
-	if (sfxVolume[0] > 20 || sfxVolume[0] < 0)
+	if (sfxVolume[0] > 20)
 		sfxVolume[0] = 0;
 }
 
 std::fstream openAppIniFileStream(std::string location) {
 	std::fstream fs_ini(location);
 	if (!fs_ini)
-		throw Program::Invalid{ "Cannot open ./System/_App.ini \nMake sure the program is in the same	directory as MBAA.exe\nor MeltyConfig.ini uses the correct path to _App.ini." };
+		throw Program::Invalid{ "Cannot open ./System/_App.ini \nMake sure the program is in the same directory as MBAA.exe\nor MeltyConfig.ini uses the correct path to _App.ini." };
 	return  fs_ini;
 }
 
-bool validateAAGameDataFileStream(std::fstream& fs) {
+bool validateAAGameDataFileStream(std::basic_fstream<unsigned char>& fs) {
 	if (!fs) {
 		throw Program::Invalid{ "Cannot open ./System/_AAGameData.dat. \nMake sure the program is in the same directory as MBAA.exe\nor MeltyConfig.ini uses the correct path to _AAGameData.dat." };
 		return false;
@@ -116,9 +114,8 @@ bool validateAAGameDataFileStream(std::fstream& fs) {
 	return true;
 }
 
-std::vector<std::pair<std::string, int>> parseAppIniStream(std::fstream &fs) {
+std::vector<std::pair<std::string, int>> parseAppIniStream(std::fstream& fs) {
 	std::vector<std::pair<std::string, int>> v;
-
 	while (fs) {
 		std::string parameter;
 		std::getline(fs, parameter, '=');
@@ -129,7 +126,6 @@ std::vector<std::pair<std::string, int>> parseAppIniStream(std::fstream &fs) {
 			break;
 		v.push_back(std::make_pair(parameter, value));
 	}
-
 	fs.seekp(0);
 	return v;
 }
@@ -137,7 +133,6 @@ std::vector<std::pair<std::string, int>> parseAppIniStream(std::fstream &fs) {
 
 int main()
 try {
-	clearScreen();
 	//SetProgramTitle
 	//std::cout << "\033]0;" << PROGRAM_TITLE << "\007";
 
@@ -161,9 +156,12 @@ try {
 	pv_aagamedata_path = mainini.GetValue("MeltyConfig", "AAGameData_dat_Path");
 
 	// --- MAIN AAGAMEDATA STREAM --- //
+
+	//std::cout << "\nPVGAMEPATH: " << pv_aagamedata_path;
 	//fstream for reading from and writing to AAGameData.dat
 	
-	std::fstream fs{pv_aagamedata_path, fs.binary | fs.in | fs.out};
+	std::basic_fstream<unsigned char> fs;
+	fs.open(pv_aagamedata_path, fs.in | fs.out | fs.binary);
 	if (!validateAAGameDataFileStream(fs))
 		return 11;
 
@@ -177,62 +175,27 @@ try {
 
 	//Option descriptions and values for the menu
 	//Copied over from https://wiki.gbl.gg/w/Melty_Blood/MBAACC/Internals#System.2F_App.ini
-
-	//Binary options on AAGameData.dat
-	OptionBinary optionCpuDifficulty{ "CPU difficulty in single player modes. Defaults to 2 (normal)\n0 (easiest) to 4 (hardest)\n", 
-		std::pair<unsigned int, unsigned int>{0, 4}, 0x04, fs, 2 };
-	OptionBinary optionWinCountArcade{ "Wins required per game in single player modes. Defaults to 2\n1 to 3\n", 
-		std::pair<unsigned int, unsigned int>{1, 3}, 0x08, fs, 2 };
-	OptionBinary optionDamageLevel{ "Damage multiplier for all game modes. Defaults to 2 (normal) \n0 (lowest) to 4 (highest)\n", 
-		std::pair<unsigned int, unsigned int>{0, 4}, 0x0C, fs, 2 };
-	OptionBinary optionTimerSpeed{ "Speed of the round timer, 0 disables time outs. Defaults to 2 (normal)\n0 (infinity) to 4 (fastest)\n", 
-		std::pair<unsigned int, unsigned int>{0, 4}, 0x10, fs, 2 };
-	OptionBinary optionWinCountVersus{ "Wins required per game in versus mode. Defaults to 2 \n1 to 3\n", 
-		std::pair<unsigned int, unsigned int>{1, 3}, 0x1C, fs, 2 };
-	OptionBinary optionSaveReplay{ "Toggle for automatically saving replays after each game. Defaults to 0 (off)  \n0 (off) or 1 (on)\n", 
-		std::pair<unsigned int, unsigned int>{0, 1}, 0x28, fs, 0 };
-	OptionBinary optionBgmVolume{ "Music volume. Defaults to 10\n0 (off) to 20 (loudest)\n", 
-		std::pair<unsigned int, unsigned int>{0, 20}, 0x144, fs, 10, true};
-	OptionBinary optionSfxVolume{ "Sound Effect and Voice volume. Defaults to 10\n0 (off) to 20 (loudest)\n", 
-		std::pair<unsigned int, unsigned int>{0, 20}, 0x148, fs, 10, true};
-	OptionBinary optionCharacterFilter{ "The character filter mode. Defaults to 2 (full) \n0 (off) 1 (edge) 2 (full) 3 (linear)\n", 
-		std::pair<unsigned int, unsigned int>{0, 3}, 0x160, fs, 2 };
-	OptionBinary optionStageAnimations{ "Whether stage animations are disabled or not. Defaults to 0 (no)\n0 (no) or 1 (yes)\n", 
-		std::pair<unsigned int, unsigned int>{0, 1}, 0x164, fs, 0 };
-	OptionBinary optionViewFps{ "Whether the FPS counter is shown. Defaults to 0 (off) \n0 (off) or 1 (on)\n", 
-		std::pair<unsigned int, unsigned int>{0, 1}, 0x168, fs, 0 };
-	OptionBinary optionFrameRate{ "Sets the speed of the game. Defaults to 0 (normal) \n0 (normal) or 1 (half)\n", 
-		std::pair<unsigned int, unsigned int>{0, 1}, 0x16C, fs, 0 };
-	OptionBinary optionScreenFilter{ "Toggle for the screen filter. Defaults to 0 (off) \n0 (off) or 1 (on)\n", 
-		std::pair<unsigned int, unsigned int>{0, 1}, 0x174, fs, 0 };
-	OptionBinary optionAspectRatio{ "The aspect ratio setting of the game. Overrides the value in _App.ini. Defaults to 1 (normal)\n0 (normal) 1 (auto) 2 (4:3) 3 (16:9) 4 (16:10) 5 (5:4) 6 (15:9)\n", 
-		std::pair<unsigned int, unsigned int>{0, 6}, 0x178, fs, 1 };
+	OptionBinary optionCpuDifficulty{ "CPU difficulty in single player modes. Defaults to 2 (normal)\n0 (easiest) to 4 (hardest)\n", std::pair<unsigned int, unsigned int>{0, 4}, 0x04, fs, 2 };
+	OptionBinary optionWinCountArcade{ "Wins required per game in single player modes. Defaults to 2\n1 to 3\n", std::pair<unsigned int, unsigned int>{1, 3}, 0x08, fs, 2 };
+	OptionBinary optionDamageLevel{ "Damage multiplier for all game modes. Defaults to 2 (normal) \n0 (lowest) to 4 (highest)\n", std::pair<unsigned int, unsigned int>{0, 4}, 0x0C, fs, 2 };
+	OptionBinary optionTimerSpeed{ "Speed of the round timer, 0 disables time outs. Defaults to 2 (normal)\n0 (infinity) to 4 (fastest)\n", std::pair<unsigned int, unsigned int>{0, 4}, 0x10, fs, 2 };
+	OptionBinary optionWinCountVersus{ "Wins required per game in versus mode. Defaults to 2 \n1 to 3\n", std::pair<unsigned int, unsigned int>{1, 3}, 0x1C, fs, 2 };
+	OptionBinary optionSaveReplay{ "Toggle for automatically saving replays after each game. Defaults to 0 (off)  \n0 (off) or 1 (on)\n", std::pair<unsigned int, unsigned int>{0, 1}, 0x28, fs, 0 };
+	OptionBinary optionBgmVolume{ "Music volume. Defaults to 10\n0 (off) to 20 (loudest)\n", std::pair<unsigned int, unsigned int>{0, 20}, 0x144, fs, 10, true};
+	OptionBinary optionSfxVolume{ "Sound Effect and Voice volume. Defaults to 10\n0 (off) to 20 (loudest)\n", std::pair<unsigned int, unsigned int>{0, 20}, 0x148, fs, 10, true};
+	OptionBinary optionCharacterFilter{ "The character filter mode. Defaults to 2 (full) \n0 (off) 1 (edge) 2 (full) 3 (linear)\n", std::pair<unsigned int, unsigned int>{0, 3}, 0x160, fs, 2 };
+	OptionBinary optionStageAnimations{ "Whether stage animations are disabled or not. Defaults to 0 (no)\n0 (no) or 1 (yes)\n", std::pair<unsigned int, unsigned int>{0, 1}, 0x164, fs, 0 };
+	OptionBinary optionViewFps{ "Whether the FPS counter is shown. Defaults to 0 (off) \n0 (off) or 1 (on)\n", std::pair<unsigned int, unsigned int>{0, 1}, 0x168, fs, 0 };
+	OptionBinary optionFrameRate{ "Sets the speed of the game. Defaults to 0 (normal) \n0 (normal) or 1 (half)\n", std::pair<unsigned int, unsigned int>{0, 1}, 0x16C, fs, 0 };
+	OptionBinary optionScreenFilter{ "Toggle for the screen filter. Defaults to 0 (off) \n0 (off) or 1 (on)\n", std::pair<unsigned int, unsigned int>{0, 1}, 0x174, fs, 0 };
+	OptionBinary optionAspectRatio{ "The aspect ratio setting of the game. Overrides the value in _App.ini. Defaults to 1 (normal)\n0 (normal) 1 (auto) 2 (4:3) 3 (16:9) 4 (16:10) 5 (5:4) 6 (15:9)\n", std::pair<unsigned int, unsigned int>{0, 6}, 0x178, fs, 1 };
 	
-	//Text options found in the App.ini
-	OptionIni optionNoVsMovie{ "Use simple vs mode screen. Defaults to 0 (off)\n0 (off) or 1 (on)\n", 
-		std::pair<unsigned int, unsigned int>{0, 1}, 
-		"NoVsMovie", "No Versus Movie", 
-		app_ini, app_ini_rc, pv_ini_path, 0 };
-	OptionIni optionWindowed{ "Start the game in windowed mode. Defaults to 0 (fullscreen)\n0 (full screen) or 1 (windowed)\n", 
-		std::pair<unsigned int, unsigned int>{0, 1}, 
-		"Windowed", "Windowed Mode", 
-		app_ini, app_ini_rc, pv_ini_path, 0 };
-	OptionIni optionScreenW{ "Width of the game screen/window in pixels. Defaults to 800\n1 to 9999\n", 
-		std::pair<unsigned int, unsigned int>{1, 9999}, 
-		"ScreenW", "Screen Width", 
-		app_ini, app_ini_rc, pv_ini_path, 800, 1 };
-	OptionIni optionScreenH{ "Height of the game screen/window in pixels. Defaults to 600\n1 to 9999\n", 
-		std::pair<unsigned int, unsigned int>{1, 9999}, 
-		"ScreenH", "Screen Height", 
-		app_ini, app_ini_rc, pv_ini_path, 600 };
-	OptionIni optionPosX{ "Position of the left edge of the game window in pixels relative to the left edge of the screen.\nIgnored in full screen mode. Defaults to 0\n1 to 9999", 
-		std::pair<unsigned int, unsigned int>{0, 9999}, 
-		"PosX", "Window Position X", 
-		app_ini, app_ini_rc, pv_ini_path, 0, 1 };
-	OptionIni optionPosY{ "Position of the top edge of the game window in pixels relative to the top edge of the screen.\nIgnored in full screen mode. Defaults to 0\n1 to 9999", 
-		std::pair<unsigned int, unsigned int>{0, 9999}, 
-		"PosY", "Window Position Y", 
-		app_ini, app_ini_rc, pv_ini_path, 0 };
+	OptionIni optionNoVsMovie{ "Use simple vs mode screen. Defaults to 0 (off)\n0 (off) or 1 (on)\n", std::pair<unsigned int, unsigned int>{0, 1}, "NoVsMovie", "No Versus Movie", app_ini, app_ini_rc, pv_ini_path, 0 };
+	OptionIni optionWindowed{ "Start the game in windowed mode. Defaults to 0 (fullscreen)\n0 (full screen) or 1 (windowed)\n", std::pair<unsigned int, unsigned int>{0, 1}, "Windowed", "Windowed Mode", app_ini, app_ini_rc, pv_ini_path, 0 };
+	OptionIni optionScreenW{ "Width of the game screen/window in pixels. Defaults to 800\n1 to 9999\n", std::pair<unsigned int, unsigned int>{1, 9999}, "ScreenW", "Screen Width", app_ini, app_ini_rc, pv_ini_path, 800, 1 };
+	OptionIni optionScreenH{ "Height of the game screen/window in pixels. Defaults to 600\n1 to 9999\n", std::pair<unsigned int, unsigned int>{1, 9999}, "ScreenH", "Screen Height", app_ini, app_ini_rc, pv_ini_path, 600 };
+	OptionIni optionPosX{ "Position of the left edge of the game window in pixels relative to the left edge of the screen.\nIgnored in full screen mode. Defaults to 0\n1 to 9999", std::pair<unsigned int, unsigned int>{0, 9999}, "PosX", "Window Position X", app_ini, app_ini_rc, pv_ini_path, 0, 1 };
+	OptionIni optionPosY{ "Position of the top edge of the game window in pixels relative to the top edge of the screen.\nIgnored in full screen mode. Defaults to 0\n1 to 9999", std::pair<unsigned int, unsigned int>{0, 9999}, "PosY", "Window Position Y", app_ini, app_ini_rc, pv_ini_path, 0 };
 	
 	//	TODO: Write a proper main loop
 	// 	This one works but the code is ugly
@@ -250,7 +213,7 @@ try {
 			}
 			if (programWindow == 0) {
 				getReadableOptionValues(fs);
-				std::cout << PROGRAM_TITLE << '\n';
+				std::cout << PROGRAM_TITLE;
 				std::cout <<
 					"[1] Difficulty\t\t\t : " << int(cpuDifficulty[0]) << "\n" <<
 					"[2] Win Count (Arcade)\t\t : " << int(winCountArcade[0]) << "\n" <<
@@ -275,7 +238,7 @@ try {
 
 				switch (input) {
 				default:
-					clearScreen();
+					system("cls");
 					break;
 				case '0': case ')':
 					exit = 1;
@@ -329,7 +292,7 @@ try {
 					std::cin >> caseDefaultInput;
 					std::cin.ignore((std::numeric_limits<std::streamsize>::max)(), '\n');
 
-					clearScreen();
+					system("cls");
 					if (caseDefaultInput == "1") {
 						optionAspectRatio.setToDefault();
 						optionBgmVolume.setToDefault();
@@ -351,7 +314,7 @@ try {
 					break;
 				}
 				case 'N':
-					clearScreen();
+					system("cls");
 					programWindow = 1;
 					break;
 				}
@@ -359,7 +322,7 @@ try {
 			if (programWindow == 1) {
 				auto fs_ini{ openAppIniFileStream(pv_ini_path) };
 				std::vector<std::pair<std::string, int>> vIni{ parseAppIniStream(fs_ini) };
-				std::cout << PROGRAM_TITLE << '\n';
+				std::cout << PROGRAM_TITLE;
 				std::cout <<
 					"[1] Resolution\t\t : " << vIni[2].second << "x" << vIni[3].second << "\n" <<
 					"[2] Window Position\t : " << vIni[5].second << "x" << vIni[6].second << "\n" <<
@@ -374,7 +337,7 @@ try {
 
 				switch (input) {
 				default:
-					clearScreen();
+					system("cls");
 					break;
 				case '0': case ')':
 					exit = 1;
@@ -400,7 +363,7 @@ try {
 					std::cin >> caseDefaultInput;
 					std::cin.ignore((std::numeric_limits<std::streamsize>::max)(), '\n');
 
-					clearScreen();
+					system("cls");
 					if (caseDefaultInput == "1") {
 						optionNoVsMovie.setToDefault();
 						optionScreenW.setToDefault();
@@ -414,23 +377,23 @@ try {
 				}
 					
 				case 'N':
-					clearScreen();
+					system("cls");
 					programWindow = 0;
 					break;
 				}
 			}
 		}
 		catch (Program::Invalid& e){
-			clearScreen();
+			system("cls");
 			std::cerr << "Exception caught: Program error\n" << e.what << '\n' << '\n';
 		}
 
 		catch (OptionBinary::Invalid& e) {
-			clearScreen();
+			system("cls");
 			std::cerr << e.what << '\n';
 		}
 		catch (OptionIni::Invalid& e) {
-			clearScreen();
+			system("cls");
 			std::cerr << e.what << '\n';
 		}
 	}

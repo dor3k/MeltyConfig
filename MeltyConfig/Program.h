@@ -2,23 +2,24 @@
 #include <string>
 
 //Byte containers
-static unsigned char wholeFile[0x17B];
-static unsigned char cpuDifficulty[1];
-static unsigned char winCountArcade[1];
-static unsigned char damageLevel[1];
-static unsigned char timerSpeed[1];
-static unsigned char winCountVersus[1];
-static unsigned char saveReplay[1];
-static unsigned char bgmVolume[1];
-static unsigned char sfxVolume[1];
-static unsigned char characterFilter[1];
-static unsigned char stageAnimations[1];
-static unsigned char viewFps[1];
-static unsigned char frameRate[1];
-static unsigned char screenFilter[1];
-static unsigned char aspectRatio[1];
+static char wholeFile[0x17B];
+static char cpuDifficulty[1];
+static char winCountArcade[1];
+static char damageLevel[1];
+static char timerSpeed[1];
+static char winCountVersus[1];
+static char saveReplay[1];
+static char bgmVolume[1];
+static char sfxVolume[1];
+static char characterFilter[1];
+static char stageAnimations[1];
+static char viewFps[1];
+static char frameRate[1];
+static char screenFilter[1];
+static char aspectRatio[1];
 
-char _getch(void);
+void clearScreen(void); /* Clears the screen */
+char _getch(void); // Pause the execution and wait for an unbuffered keyboard input, then return the character and resume
 
 class Program
 {

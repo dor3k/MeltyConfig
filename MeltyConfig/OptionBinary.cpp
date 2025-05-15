@@ -1,6 +1,6 @@
 #include "OptionBinary.h"
 
-OptionBinary::OptionBinary(std::string description, std::pair<unsigned int, unsigned int> valuesRange, unsigned int offset, std::basic_fstream<unsigned char>& filestream, unsigned int defaultValue)
+OptionBinary::OptionBinary(std::string description, std::pair<unsigned int, unsigned int> valuesRange, unsigned int offset, std::fstream& filestream, unsigned int defaultValue)
 	:pDesc{ description }, pValuesRange{ valuesRange }, pOffset{ offset }, pFileStream{ filestream }, pDefaultValue{ defaultValue }, pFlagConvertMusicValues {0}
  {
 	if (description == "" || description == " ")
@@ -13,7 +13,7 @@ OptionBinary::OptionBinary(std::string description, std::pair<unsigned int, unsi
 		throw Invalid{ "OptionBinary Construtor: Invalid filestream" };
 
 }
-OptionBinary::OptionBinary(std::string description, std::pair<unsigned int, unsigned int> valuesRange, unsigned int offset, std::basic_fstream<unsigned char>& filestream, unsigned int defaultValue, bool convertMusicValues)
+OptionBinary::OptionBinary(std::string description, std::pair<unsigned int, unsigned int> valuesRange, unsigned int offset, std::fstream& filestream, unsigned int defaultValue, bool convertMusicValues)
 	:pDesc{ description }, pValuesRange{ valuesRange }, pOffset{ offset }, pFileStream{ filestream }, pDefaultValue{ defaultValue }, pFlagConvertMusicValues{ convertMusicValues }
 {
 	if (description == "" || description == " ")
@@ -31,7 +31,7 @@ void OptionBinary::initialize()
 	getInput();
 	setValue();
 
-	system("cls");
+	clearScreen();
 	std::cout << "INFO: Value set to 0x" << std::hex << pUserInput << " at offset 0x" << pOffset << std::dec << '\n';
 }
 int OptionBinary::convertMusicValues(int value)
@@ -89,12 +89,12 @@ bool OptionBinary::validateInput(int& input){
 //Conversion to binary done by filestream std::ios::binary
 //If filestrean would be open without the flag the values could be incorrect
 void OptionBinary::setToDefault(){
-	unsigned char value[1]{ pDefaultValue };
+	char value[1]{ static_cast<char>(pDefaultValue) };
 	pFileStream.seekp(pOffset);
 	pFileStream.write(value, 1);
 }
 void OptionBinary::setValue(){
-	unsigned char value[1]{ pUserInput };
+    char value[1]{ static_cast<char>(pUserInput) };
 	pFileStream.seekp(pOffset);
 	pFileStream.write(value, 1);
 }

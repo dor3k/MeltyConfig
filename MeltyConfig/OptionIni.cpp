@@ -37,7 +37,7 @@ void OptionIni::initialize()
 	setValue();
 
 	if (!f_no_clear) 
-		system("cls");
+		clearScreen();
 
 	std::cout << "Value '" << pDisplayName << "' set to " << pUserInput << '\n';
 }
