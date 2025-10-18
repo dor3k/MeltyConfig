@@ -19,7 +19,16 @@ static char screenFilter[1];
 static char aspectRatio[1];
 
 void clearScreen(void); /* Clears the screen */
+/* The implementation varies depending on the OS, the behavior is defined in Program.cpp*/
+
+#ifdef __unix__
 char _getch(void); // Pause the execution and wait for an unbuffered keyboard input, then return the character and resume
+#endif
+
+#ifdef _WIN32
+#include <conio.h>
+#include <tchar.h>
+#endif //win32
 
 class Program
 {

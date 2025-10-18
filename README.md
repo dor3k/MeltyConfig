@@ -1,4 +1,4 @@
-# MeltyConfig 0.4
+# MeltyConfig 0.5
 ###### A program which allows you to edit Melty Blood Actress Again Current Code's config data files without the need to open up MBAA.exe to do so.
 
 ## Getting Started
@@ -12,15 +12,14 @@
 **MAKE SURE THE PROGRAM IS NOT RUNNING WHEN YOU OPEN THE GAME AS THE GAME WON'T HAVE ACCESS TO THOSE FILES, INSTEAD LOADING DEFAULT VALUES**
 
 MAKE SURE THE GAME IS NOT OPEN WHEN YOU ARE EDITING THE CONFIG FILES AS THE CHANGES MAY NOT SAVE
-## Changelog 0.4
+## Changelog 0.5
 - Bugfixes
-- Volume Options are now displayed and inputted in a logical way reflecting their in-game values instead of their internal ones
-- Added the option to abort changing values
+- - Unix compatibility added, the program will now either use the system provided function or use an alternative function depending on the OS
 
 # LICENSE
 MIT License
 
-Copyright (c) 2022 dor3k
+Copyright (c) 2022-2025 dor3k
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

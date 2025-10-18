@@ -1,15 +1,15 @@
+// Contains system agnostic implementations of functions for _getch() and clearScreen()
 #include "Program.h"
-#include <termios.h> 
-#include <unistd.h> 
 #include <stdio.h> 
 
+// _getch() implementation for unix
+// Pause the execution and wait for an unbuffered keyboard input, then return the character and resume
+// _getch() is implemented in conio.h on Windows and is declared in Program.h
 
-// _getch() implementation
-#ifdef _WIN32
-#include <conio.h>
-#include <tchar.h>
-#endif //win32
 #ifdef __unix__
+#include <termios.h> 
+#include <unistd.h> 
+
 char _getch(void) 
 { 
     struct termios oldattr, newattr; 
@@ -24,8 +24,8 @@ char _getch(void)
 }
 #endif //unix
 
-
-// clearing the temrinal window implementation
+// clearScreen() implementation
+// the function clears the window using the appropriate shell command
 #ifdef _WIN32
 void clearScreen(void){
     std::system("cls");
