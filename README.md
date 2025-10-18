@@ -56,9 +56,11 @@ On Linux, run build.sh
 ```
 
 The program will be built in the ./MeltyConfig/main/ directory. From there either place it in the Melty Blood folder or place it somewhere else and configure the MeltyConfig.ini file to point to the proper directories.
+
 ## Changelog 0.5
-- Bugfixes
 - Unix compatibility added, the program will now either use the system provided function or use an alternative function depending on the OS
+- Bugfixes
+- Project cleanup
 
 # LICENSE
 MIT License

@@ -20,10 +20,10 @@ constexpr auto PROGRAM_TITLE = "Melty Config v0.5";
 // Created by dor3k
 // https://github.com/dor3k/MeltyConfig
 //
+// - Unix compatibility added, the program will now either use the system provided function or use an alternative function depending on the OS
 // - Bugfixes
-// - Unix compatibility added, the program will now either use the system provided function
-//   Or use an alternative function depending on the OS
-// 
+// - Project cleanup
+//
 ///////////////////////////////////
 
 //TODO: Main program loop
