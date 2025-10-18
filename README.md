@@ -16,9 +16,11 @@ MAKE SURE THE GAME IS NOT OPEN WHEN YOU ARE EDITING THE CONFIG FILES AS THE CHAN
 
 ## Build instructions
 The program was built using G++.
-Use whatever toolchain you want to compile and link all the files in ./MeltyConfig/src directory
+Use whatever toolchain you want to compile and link all the files in ./main/src directory
 
-As an example there are two build scripts provided in the ./MeltyConfig directory which use G++ to build the program, one for Linux and the other for Windows
+The files inside of the ./main/System directory are used for testing, and can be ignored.
+
+As an example there are two build scripts provided in the ./main directory which use G++ to build the program, one for Linux and the other for Windows
 ```
 cd ./src
 
