@@ -30,6 +30,30 @@ g++ -pedantic-errors -std=c++20 -c Program.cpp
 
 g++ -std=c++20 -pedantic-errors main.o ConvertUTF.o OptionBinary.o OptionIni.o Program.o -o ../MeltyConfig
 ```
+1. Make sure you have GCC/G++ installed on your system
+On Windows this can be done by installing MinGW toolchain using MSYS2
+https://code.visualstudio.com/docs/cpp/config-mingw
+
+On Linux you will need to download the packages provided by your distribution
+2. Clone the repository using git
+```
+git clone https://github.com/dor3k/MeltyConfig.git
+```
+3. Navigate to the path where build.sh and build.bat are stored
+```
+cd ./MeltyConfig/main/
+```
+4. Run the provided build scripts depending on your system to build the application using g++
+On Windows, run build.bat
+```
+./build.bat
+```
+On Linux, run build.sh
+```
+./build.sh
+```
+
+The program will be built in the ./MeltyConfig/main/ directory. From there either place it in the Melty Blood folder or place it somewhere else and configure the MeltyConfig.ini file to point to the proper directories.
 ## Changelog 0.5
 - Bugfixes
 - Unix compatibility added, the program will now either use the system provided function or use an alternative function depending on the OS
